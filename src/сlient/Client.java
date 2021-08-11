@@ -15,12 +15,29 @@ public class Client {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream()); // Поток вывода
             String response = in.readUTF(); // Читаем ответ от сервера
             System.out.println(response);
+            response = in.readUTF();
+            System.out.println(response);
             Scanner scanner = new Scanner(System.in);
+            out.writeUTF(scanner.nextLine()); // Ожидаем ввод имени
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    String response;
+                    while (true){ // Бесконечно ожидаем сообщение от сервера
+                        try {
+                            response = in.readUTF(); // Читаем ответ от сервера
+                            System.out.println(response); // Печатаем ответ от сервера на экран
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+            thread.start();
             while (true){
                 String consoleText = scanner.nextLine(); // Ждём сообщение от пользователя
                 out.writeUTF(consoleText); // Отправляем сообщение на сервер
-                response = in.readUTF(); // Читаем ответ от сервера
-                System.out.println("Ответ сервера: "+response); // Печатаем ответ от сервера на экран
+
             }
         } catch (IOException e) {
             e.printStackTrace();
